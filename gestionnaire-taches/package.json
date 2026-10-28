@@ -1,0 +1,11 @@
+{
+  "name": "taskflow-browser-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test tests/taskflow.spec.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}
