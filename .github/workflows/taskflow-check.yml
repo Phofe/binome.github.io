@@ -12,8 +12,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  javascript-syntax:
+  browser-tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gestionnaire-taches
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v4
@@ -21,8 +24,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Vérifier la syntaxe JavaScript intégrée
+      - name: Installer les dépendances
+        run: npm install --no-audit --no-fund
+      - name: Installer Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Démarrer le serveur statique
         run: |
-          sed -n '/^<script>$/,/^<\/script><\/body><\/html>/{ /^<script>$/d; /^<\/script><\/body><\/html>/d; p; }' gestionnaire-taches/index.html > /tmp/taskflow-inline.js
-          test -s /tmp/taskflow-inline.js
-          node --check /tmp/taskflow-inline.js
+          python3 -m http.server 4173 --directory . > /tmp/taskflow-server.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/taskflow-server.log
+          exit 1
+      - name: Exécuter les scénarios navigateur
+        run: npm run test:e2e
