@@ -1,0 +1,28 @@
+name: Vérifier TaskFlow
+
+on:
+  push:
+    paths:
+      - "gestionnaire-taches/**"
+      - ".github/workflows/taskflow-check.yml"
+  pull_request:
+    paths:
+      - "gestionnaire-taches/**"
+      - ".github/workflows/taskflow-check.yml"
+  workflow_dispatch:
+
+jobs:
+  javascript-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Vérifier la syntaxe JavaScript intégrée
+        run: |
+          sed -n '/^<script>$/,/^<\/script><\/body><\/html>/{ /^<script>$/d; /^<\/script><\/body><\/html>/d; p; }' gestionnaire-taches/index.html > /tmp/taskflow-inline.js
+          test -s /tmp/taskflow-inline.js
+          node --check /tmp/taskflow-inline.js
