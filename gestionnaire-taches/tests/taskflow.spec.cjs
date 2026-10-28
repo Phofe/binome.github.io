@@ -38,7 +38,7 @@ test.describe("TaskFlow — parcours utilisateur", () => {
     await page.getByRole("button", { name: "Terminées", exact: true }).click();
     await expect(page.getByRole("heading", { name: "CV finalisé" })).toBeVisible();
 
-    await page.getByRole("searchbox").fill("introuvable");
+    await page.getByLabel("Rechercher une tâche").fill("introuvable");
     await expect(page.getByText("Aucune tâche ne correspond à ces filtres.")).toBeVisible();
     await page.getByRole("searchbox").fill("finalisé");
     await expect(page.getByRole("heading", { name: "CV finalisé" })).toBeVisible();
